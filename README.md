@@ -31,6 +31,10 @@ PORT=8080 npm start
 
 A mesma aplicação serve os arquivos estáticos de `public/` na raiz (`/`), onde o frontend será publicado.
 
+## Interface web
+
+Com o servidor rodando (`npm run dev` ou `npm start`), acesse `http://localhost:3000` no navegador. A página tem um campo de CEP (com máscara `00000-000`), botão "Consultar" e uma área de resultado que mostra o endereço completo ou uma mensagem de erro em português.
+
 ## Como testar
 
 ```bash
@@ -125,4 +129,7 @@ src/
   lib/http.ts              fetch com timeout
 tests/                     testes (Vitest) com HTTP externo mockado
 public/                    frontend estático, servido em /
+  index.html               página de consulta
+  styles.css               estilo
+  app.js                   chamada à API e tratamento dos cenários de resposta
 ```

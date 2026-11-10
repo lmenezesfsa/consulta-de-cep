@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta de CEP</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Consulta de CEP</h1>
+    <p class="subtitulo">Digite um CEP para ver o endereço completo.</p>
+
+    <form id="form-cep" class="form-cep" novalidate>
+      <div class="campo">
+        <label for="input-cep">CEP</label>
+        <input
+          type="text"
+          id="input-cep"
+          name="cep"
+          inputmode="numeric"
+          placeholder="00000-000"
+          maxlength="9"
+          autocomplete="off"
+        />
+      </div>
+      <button type="submit" id="botao-consultar">Consultar</button>
+    </form>
+
+    <p id="mensagem-erro" class="mensagem-erro" role="alert" hidden></p>
+
+    <section id="resultado" class="resultado" aria-live="polite"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
