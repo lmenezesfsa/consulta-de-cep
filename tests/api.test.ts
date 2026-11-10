@@ -60,6 +60,19 @@ describe('GET /api/cep/:cep', () => {
     expect(primario.chamadas).toEqual([]);
   });
 
+  it('devolve 400 para CEP vazio (sem dígitos depois da barra)', async () => {
+    const primario = provedorFake('viacep', { tipo: 'nao_encontrado' });
+
+    const resposta = await request(appCom(primario)).get('/api/cep/');
+
+    expect(resposta.status).toBe(400);
+    expect(resposta.body).toEqual({
+      erro: 'cep_invalido',
+      mensagem: 'O CEP deve conter 8 dígitos.',
+    });
+    expect(primario.chamadas).toEqual([]);
+  });
+
   it('devolve 404 quando a fonte primária não encontra o CEP', async () => {
     const primario = provedorFake('viacep', { tipo: 'nao_encontrado' });
     const fallback = provedorFake('brasilapi', {

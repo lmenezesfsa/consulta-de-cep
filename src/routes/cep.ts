@@ -26,6 +26,13 @@ export function criarRotasCep(servico: ServicoCep): Router {
     res.json({ status: 'ok' });
   });
 
+  // Express não casa `/cep/:cep` com CEP vazio (`/cep` ou `/cep/`); tratamos
+  // explicitamente para cair na mesma validação e devolver 400 cep_invalido,
+  // em vez de 404 genérico de rota não encontrada.
+  router.get(['/cep', '/cep/'], (_req, res) => {
+    res.status(400).json(ERROS.cep_invalido);
+  });
+
   router.get('/cep/:cep', async (req, res, next) => {
     const informado = req.params.cep ?? '';
 

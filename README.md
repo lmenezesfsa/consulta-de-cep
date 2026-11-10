@@ -114,6 +114,10 @@ curl localhost:3000/api/health         # 200
 - A resposta do BrasilAPI é normalizada para o contrato acima (`street` → `logradouro`, `neighborhood` → `bairro`, `city` → `localidade`, `state` → `uf`). A v2 do BrasilAPI não devolve `ibge`, `ddd` nem `complemento`, então esses campos vêm como string vazia quando a resposta vem do fallback.
 - Consultas bem-sucedidas ficam em **cache em memória por 1 hora**. Não há banco de dados; reiniciar o servidor limpa o cache.
 
+## Console do navegador em respostas de erro
+
+Ao consultar um CEP inválido, inexistente ou com as fontes fora do ar, o navegador registra no console algo como `Failed to load resource: the server responded with a status of 400/404/502`. **Isso é esperado e não é um bug**: é o comportamento nativo do `fetch()` ao chamar uma URL que responde com status HTTP não-2xx — o próprio navegador loga o aviso antes do código da página tratar a resposta. A interface já trata esses casos e exibe a mensagem amigável correspondente (`cep_invalido`, `cep_nao_encontrado`, `fonte_indisponivel`); mantemos os status HTTP semânticos (400/404/502) porque é o contrato correto da API, em vez de mascarar erros como 200.
+
 ## Estrutura
 
 ```
