@@ -142,8 +142,8 @@ function mostrarEndereco(endereco) {
 
 function mostrarCarregandoBotao(carregando) {
   botao.disabled = carregando;
-  iconeBusca.hidden = carregando;
-  iconeSpinner.hidden = !carregando;
+  iconeBusca.toggleAttribute('hidden', carregando);
+  iconeSpinner.toggleAttribute('hidden', !carregando);
   textoBotao.textContent = carregando ? 'Consultando...' : 'Consultar';
 }
 
