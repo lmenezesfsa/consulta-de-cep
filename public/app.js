@@ -1,8 +1,37 @@
 const form = document.getElementById('form-cep');
 const input = document.getElementById('input-cep');
 const botao = document.getElementById('botao-consultar');
+const iconeBusca = botao.querySelector('.icone-busca');
+const iconeSpinner = botao.querySelector('.icone-spinner');
+const textoBotao = botao.querySelector('.texto-botao');
 const mensagemErro = document.getElementById('mensagem-erro');
+const mensagemErroTexto = document.getElementById('mensagem-erro-texto');
 const resultado = document.getElementById('resultado');
+const botaoTema = document.getElementById('botao-tema');
+
+const CHAVE_TEMA = 'nexus-cep-tema';
+
+function temaEscuroAtivo() {
+  return document.documentElement.classList.contains('dark');
+}
+
+function atualizarRotuloTema() {
+  const escuro = temaEscuroAtivo();
+  botaoTema.setAttribute('aria-label', escuro ? 'Ativar modo claro' : 'Ativar modo escuro');
+}
+
+botaoTema.addEventListener('click', () => {
+  const escuro = !temaEscuroAtivo();
+  document.documentElement.classList.toggle('dark', escuro);
+  try {
+    localStorage.setItem(CHAVE_TEMA, escuro ? 'escuro' : 'claro');
+  } catch {
+    /* localStorage indisponível; preferência vale só para esta sessão */
+  }
+  atualizarRotuloTema();
+});
+
+atualizarRotuloTema();
 
 function formatarCep(valor) {
   const digitos = valor.replace(/\D/g, '').slice(0, 8);
@@ -19,19 +48,44 @@ input.addEventListener('input', () => {
 });
 
 function mostrarErro(texto) {
-  mensagemErro.textContent = texto;
+  mensagemErroTexto.textContent = texto;
   mensagemErro.hidden = false;
   input.setAttribute('aria-invalid', 'true');
+  input.setAttribute('aria-describedby', 'dica-cep mensagem-erro');
 }
 
 function limparErro() {
-  mensagemErro.textContent = '';
+  mensagemErroTexto.textContent = '';
   mensagemErro.hidden = true;
   input.removeAttribute('aria-invalid');
+  input.setAttribute('aria-describedby', 'dica-cep');
+}
+
+function mostrarEstadoVazio() {
+  resultado.innerHTML = `
+    <div class="estado-vazio">
+      <span class="estado-vazio-icone">
+        <svg class="icone" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+      </span>
+      <p class="estado-vazio-titulo">Nenhuma consulta realizada</p>
+      <p class="estado-vazio-texto">Digite um CEP acima para ver o endereço completo.</p>
+    </div>
+  `;
 }
 
 function mostrarCarregando() {
-  resultado.innerHTML = '<p class="carregando">Consultando...</p>';
+  resultado.innerHTML = `
+    <div class="esqueleto-card" role="status">
+      <span class="sr-only">Consultando CEP...</span>
+      <div class="esqueleto-linha"></div>
+      <div class="esqueleto-linha"></div>
+      <div class="esqueleto-linha"></div>
+      <div class="esqueleto-linha"></div>
+    </div>
+  `;
 }
 
 function limparResultado() {
@@ -40,23 +94,39 @@ function limparResultado() {
 
 function mostrarEndereco(endereco) {
   const linhas = [
-    ['CEP', endereco.cep],
-    ['Logradouro', endereco.logradouro || '—'],
-    ['Complemento', endereco.complemento || '—'],
-    ['Bairro', endereco.bairro || '—'],
-    ['Cidade', endereco.localidade || '—'],
-    ['UF', endereco.uf || '—'],
-    ['IBGE', endereco.ibge || '—'],
-    ['DDD', endereco.ddd || '—'],
+    ['CEP', endereco.cep, true],
+    ['Logradouro', endereco.logradouro || '—', false],
+    ['Complemento', endereco.complemento || '—', false],
+    ['Bairro', endereco.bairro || '—', false],
+    ['Cidade', endereco.localidade || '—', false],
+    ['UF', endereco.uf || '—', false],
+    ['IBGE', endereco.ibge || '—', true],
+    ['DDD', endereco.ddd || '—', true],
   ];
+
+  const card = document.createElement('div');
+  card.className = 'endereco-card';
+
+  const badge = document.createElement('p');
+  badge.className = 'badge';
+  badge.innerHTML = `
+    <svg class="icone" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+      <path d="m9 11 3 3L22 4"></path>
+    </svg>
+    Endereço encontrado
+  `;
 
   const dl = document.createElement('dl');
   dl.className = 'endereco';
 
-  for (const [rotulo, valor] of linhas) {
+  for (const [rotulo, valor, ehCodigo] of linhas) {
     const dt = document.createElement('dt');
     dt.textContent = rotulo;
     const dd = document.createElement('dd');
+    if (ehCodigo) {
+      dd.className = 'valor-codigo';
+    }
     dd.textContent = valor;
     dl.append(dt, dd);
   }
@@ -64,10 +134,17 @@ function mostrarEndereco(endereco) {
   const fonte = document.createElement('p');
   fonte.className = 'fonte';
   fonte.textContent = `Fonte: ${endereco.fonte}`;
-  dl.appendChild(fonte);
 
+  card.append(badge, dl, fonte);
   resultado.innerHTML = '';
-  resultado.appendChild(dl);
+  resultado.appendChild(card);
+}
+
+function mostrarCarregandoBotao(carregando) {
+  botao.disabled = carregando;
+  iconeBusca.hidden = carregando;
+  iconeSpinner.hidden = !carregando;
+  textoBotao.textContent = carregando ? 'Consultando...' : 'Consultar';
 }
 
 async function consultarCep(cepDigitado) {
@@ -81,7 +158,7 @@ async function consultarCep(cepDigitado) {
   limparErro();
   limparResultado();
   mostrarCarregando();
-  botao.disabled = true;
+  mostrarCarregandoBotao(true);
 
   try {
     const resposta = await fetch(`/api/cep/${digitos}`);
@@ -111,7 +188,7 @@ async function consultarCep(cepDigitado) {
     limparResultado();
     mostrarErro('Falha de conexão. Verifique sua internet e tente novamente.');
   } finally {
-    botao.disabled = false;
+    mostrarCarregandoBotao(false);
   }
 }
 
@@ -119,3 +196,5 @@ form.addEventListener('submit', (evento) => {
   evento.preventDefault();
   consultarCep(input.value);
 });
+
+mostrarEstadoVazio();
