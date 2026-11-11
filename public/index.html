@@ -58,31 +58,33 @@
       </header>
 
       <form id="form-cep" class="form-cep" novalidate>
-        <div class="campo">
-          <label for="input-cep">CEP</label>
-          <input
-            type="text"
-            id="input-cep"
-            name="cep"
-            inputmode="numeric"
-            placeholder="00000-000"
-            maxlength="9"
-            autocomplete="off"
-            aria-describedby="dica-cep"
-          />
-          <p id="dica-cep" class="dica">Formato: 00000-000</p>
+        <div class="form-cep-linha">
+          <div class="campo">
+            <label for="input-cep">CEP</label>
+            <input
+              type="text"
+              id="input-cep"
+              name="cep"
+              inputmode="numeric"
+              placeholder="00000-000"
+              maxlength="9"
+              autocomplete="off"
+              aria-describedby="dica-cep"
+            />
+          </div>
+          <button type="submit" id="botao-consultar" class="botao botao-primario">
+            <svg class="icone icone-busca" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <svg class="icone icone-spinner" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" hidden>
+              <circle cx="12" cy="12" r="9" stroke-opacity="0.25"></circle>
+              <path d="M21 12a9 9 0 0 0-9-9"></path>
+            </svg>
+            <span class="texto-botao">Consultar</span>
+          </button>
         </div>
-        <button type="submit" id="botao-consultar" class="botao botao-primario">
-          <svg class="icone icone-busca" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </svg>
-          <svg class="icone icone-spinner" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" hidden>
-            <circle cx="12" cy="12" r="9" stroke-opacity="0.25"></circle>
-            <path d="M21 12a9 9 0 0 0-9-9"></path>
-          </svg>
-          <span class="texto-botao">Consultar</span>
-        </button>
+        <p id="dica-cep" class="dica">Formato: 00000-000</p>
       </form>
 
       <div id="mensagem-erro" class="alerta alerta-erro" role="alert" hidden>
